@@ -12,7 +12,7 @@ import (
 	"google.golang.org/genai"
 )
 
-const endpoint = "wss://dev-grootafe-pa-googleapis.sandbox.google.com/ws/cloud.ai.groot.afe.GRootAfeService/ExecuteAction"
+const endpoint = "wss://dev-grootafe-pa-googleapis.sandbox.google.com/ws/cloud.ai.groot.afe.GRootAfeService/ExecuteActions"
 
 func main() {
 	ctx := context.Background()

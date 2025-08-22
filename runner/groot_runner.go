@@ -5,14 +5,15 @@ import (
 	"fmt"
 	"iter"
 	"log"
+	"os"
 	"strings"
 
-	"github.com/gorilla/websocket"
 	"google.golang.org/adk/agent"
 	"google.golang.org/adk/internal/agent/parentmap"
 	"google.golang.org/adk/internal/agent/runconfig"
 	"google.golang.org/adk/internal/llminternal"
 	"google.golang.org/adk/llm"
+	"google.golang.org/adk/runner/internal"
 	"google.golang.org/adk/session"
 	"google.golang.org/adk/sessionservice"
 	"google.golang.org/genai"
@@ -24,20 +25,26 @@ type GRootRunner struct {
 	SessionService sessionservice.Service
 
 	parents parentmap.Map
-
-	grootConn *websocket.Conn
+	client  *internal.Client
 }
 
 func NewGRootRunner(endpoint string, appName string, rootAgent agent.Agent) (*GRootRunner, error) {
-	c, _, err := websocket.DefaultDialer.Dial(endpoint, nil)
+	client, err := internal.NewClient(endpoint, os.Getenv("GROOT_KEY"))
 	if err != nil {
+		return nil, err
+	}
+	sess, err := client.OpenSession("hello123434343434343")
+	if err != nil {
+		return nil, err
+	}
+	if err := sess.ExecuteActions(nil, nil); err != nil {
 		return nil, err
 	}
 	return &GRootRunner{
 		AppName:        appName,
 		RootAgent:      rootAgent,
 		SessionService: sessionservice.Mem(),
-		grootConn:      c,
+		client:         client,
 	}, nil
 }
 
