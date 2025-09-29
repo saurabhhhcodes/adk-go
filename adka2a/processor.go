@@ -95,6 +95,7 @@ func (p *eventProcessor) makeTerminalEvents() []a2a.Event {
 
 	ev := a2a.NewStatusUpdateEvent(p.task, a2a.TaskStateCompleted, nil)
 	ev.Metadata = p.meta.eventMeta
+	ev.Final = true
 	result = append(result, ev)
 	return result
 }
