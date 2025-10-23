@@ -19,7 +19,6 @@ import (
 
 	"github.com/a2aproject/a2a-go/a2a"
 	"google.golang.org/adk/agent"
-	"google.golang.org/adk/model"
 	"google.golang.org/adk/session"
 	"google.golang.org/genai"
 )
@@ -34,7 +33,6 @@ func NewRemoteAgentEvent(ctx agent.InvocationContext) *session.Event {
 	event := session.NewEvent(ctx.InvocationID())
 	event.Author = ctx.Agent().Name()
 	event.Branch = ctx.Branch()
-	event.LLMResponse = &model.LLMResponse{}
 	return event
 }
 
@@ -228,6 +226,7 @@ func finalTaskStatusUpdateToEvent(ctx agent.InvocationContext, update *a2a.TaskS
 		event.Content = genai.NewContentFromParts(parts, genai.RoleModel)
 	}
 	event.CustomMetadata = ToCustomMetadata(update.TaskID, update.ContextID)
+	event.TurnComplete = true
 	return event, nil
 }
 
