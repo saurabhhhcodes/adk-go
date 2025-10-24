@@ -98,7 +98,7 @@ func newRemoteAgent(t *testing.T, name string, listener *bufconn.Listener) agent
 	clientFactory := newTestClientFactory(listener)
 	agent, err := New(A2AConfig{Name: name, AgentCard: card, ClientFactory: clientFactory})
 	if err != nil {
-		t.Errorf("remoteagent.New() error = %v", err)
+		t.Fatalf("remoteagent.New() error = %v", err)
 	}
 	return agent
 }
@@ -109,11 +109,11 @@ func newInvocationContext(t *testing.T, events []*session.Event) agent.Invocatio
 	service := session.InMemoryService()
 	resp, err := service.Create(ctx, &session.CreateRequest{AppName: t.Name(), UserID: "test"})
 	if err != nil {
-		t.Errorf("sessionService.Create() error = %v", err)
+		t.Fatalf("sessionService.Create() error = %v", err)
 	}
 	for _, event := range events {
 		if err := service.AppendEvent(ctx, resp.Session, event); err != nil {
-			t.Errorf("sessionService.AppendEvent() error = %v", err)
+			t.Fatalf("sessionService.AppendEvent() error = %v", err)
 		}
 	}
 	ic := icontext.NewInvocationContext(ctx, icontext.InvocationContextParams{Session: resp.Session})
@@ -153,7 +153,7 @@ func newADKEventReplay(t *testing.T, events []*session.Event) a2asrv.AgentExecut
 		},
 	})
 	if err != nil {
-		t.Errorf("agent.New() error = %v", err)
+		t.Fatalf("agent.New() error = %v", err)
 	}
 	return adka2a.NewExecutor(adka2a.ExecutorConfig{
 		RunnerConfig: runner.Config{
@@ -495,7 +495,7 @@ func TestRemoteAgent_EmptyResultForEmptySession(t *testing.T) {
 		cmpopts.IgnoreFields(session.Event{}, "Timestamp"),
 	}
 	if diff := cmp.Diff(wantEvents, gotEvents, ignoreFields...); diff != "" {
-		t.Errorf("agent.Run() wrong result (+got,-want):\ngot = %+v\nwant = %+v\ndiff = %s", gotEvents, wantEvents, diff)
+		t.Fatalf("agent.Run() wrong result (+got,-want):\ngot = %+v\nwant = %+v\ndiff = %s", gotEvents, wantEvents, diff)
 	}
 }
 
@@ -519,13 +519,13 @@ func TestRemoteAgent_ResolvesAgentCard(t *testing.T) {
 	clientFactory := newTestClientFactory(listener)
 	remoteAgent, err := New(A2AConfig{Name: "a2a", AgentCardSource: cardServer.URL, ClientFactory: clientFactory})
 	if err != nil {
-		t.Errorf("remoteagent.New() error = %v", err)
+		t.Fatalf("remoteagent.New() error = %v", err)
 	}
 
 	ictx := newInvocationContext(t, []*session.Event{newUserHello()})
 	gotEvents, err := runAndCollect(ictx, remoteAgent)
 	if err != nil {
-		t.Errorf("agent.Run() error = %v", err)
+		t.Fatalf("agent.Run() error = %v", err)
 	}
 
 	ignoreFields := []cmp.Option{
@@ -533,7 +533,7 @@ func TestRemoteAgent_ResolvesAgentCard(t *testing.T) {
 	}
 	gotResponses := toLLMResponses(gotEvents)
 	if diff := cmp.Diff(wantResponses, gotResponses, ignoreFields...); diff != "" {
-		t.Errorf("agent.Run() wrong result (+got,-want):\ngot = %+v\nwant = %+v\ndiff = %s", gotResponses, wantResponses, diff)
+		t.Fatalf("agent.Run() wrong result (+got,-want):\ngot = %+v\nwant = %+v\ndiff = %s", gotResponses, wantResponses, diff)
 	}
 }
 
