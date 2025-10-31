@@ -16,6 +16,7 @@ package adka2a
 
 import (
 	"fmt"
+	"regexp"
 	"slices"
 	"strings"
 
@@ -249,16 +250,9 @@ func replacePronouns(instruction string) string {
 		{"your", "my"},
 		{"you", "I"},
 	}
-	lower := strings.ToLower(instruction)
 	for _, sub := range substitutions {
-		for {
-			start := strings.Index(lower, sub.original)
-			if start < 0 {
-				break
-			}
-			instruction = instruction[:start] + sub.target + instruction[start+len(sub.original):]
-			lower = lower[:start] + sub.target + lower[start+len(sub.original):]
-		}
+		pattern := regexp.MustCompile(fmt.Sprintf(`(?i)\b%s\b`, sub.original))
+		instruction = pattern.ReplaceAllString(instruction, sub.target)
 	}
 	return instruction
 }

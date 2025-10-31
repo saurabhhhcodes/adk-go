@@ -351,24 +351,32 @@ func TestReplacePronouns(t *testing.T) {
 		want  string
 	}{
 		{
-			input: "you are an agent",
-			want:  "I am an agent",
+			input: "you are an agent. you were an agent, you're an agent, you've tasks, your tasks",
+			want:  "I am an agent. I was an agent, I am an agent, I have tasks, my tasks",
 		},
 		{
-			input: "you were an agent",
-			want:  "I was an agent",
+			input: "You should do your work and it will be yours.",
+			want:  "I should do my work and it will be mine.",
 		},
 		{
-			input: "You're an agent",
-			want:  "I am an agent",
+			input: "YOU should do YOUR work and it will be YOURS.",
+			want:  "I should do my work and it will be mine.",
 		},
 		{
-			input: "yoU've been an agent",
-			want:  "I have been an agent",
+			input: "You should do Your work and it will be Yours.",
+			want:  "I should do my work and it will be mine.",
 		},
 		{
-			input: "What yours is mine",
-			want:  "What mine is mine",
+			input: "This is a test message without pronouns.",
+			want:  "This is a test message without pronouns.",
+		},
+		{
+			input: "youth, yourself, yourname",
+			want:  "youth, yourself, yourname",
+		},
+		{
+			input: "You are a helpful chatbot",
+			want:  "I am a helpful chatbot",
 		},
 		{
 			input: "Your task is to be helpful",
@@ -377,10 +385,6 @@ func TestReplacePronouns(t *testing.T) {
 		{
 			input: "you you you",
 			want:  "I I I",
-		},
-		{
-			input: "you are an agent. you were an agent, you're an agent, you've tasks, your tasks",
-			want:  "I am an agent. I was an agent, I am an agent, I have tasks, my tasks",
 		},
 	}
 	for _, tc := range testCases {
