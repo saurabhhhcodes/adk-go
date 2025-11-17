@@ -57,9 +57,7 @@ func EventToMessage(event *session.Event) (*a2a.Message, error) {
 	}
 
 	msg := a2a.NewMessage(role, parts...)
-	if event.Actions.Escalate {
-		msg.Metadata = map[string]any{metadataEscalateKey: true}
-	}
+	msg.Metadata = setEscalateMeta(msg.Metadata, event.Actions.Escalate)
 	return msg, nil
 }
 

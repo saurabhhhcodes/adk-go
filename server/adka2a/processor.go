@@ -114,16 +114,15 @@ func (p *eventProcessor) makeTerminalEvents() []a2a.Event {
 
 	for _, s := range []a2a.TaskState{a2a.TaskStateFailed, a2a.TaskStateInputRequired} {
 		if ev, ok := p.terminalEvents[s]; ok {
-			setEscalateMeta(ev, p.escalate)
+			setEscalateMeta(ev.Metadata, p.escalate)
 			result = append(result, ev)
 			return result
 		}
 	}
 
 	ev := a2a.NewStatusUpdateEvent(p.reqCtx, a2a.TaskStateCompleted, nil)
-	ev.Metadata = p.meta.eventMeta
 	ev.Final = true
-	setEscalateMeta(ev, p.escalate)
+	ev.Metadata = setEscalateMeta(p.meta.eventMeta, p.escalate)
 	result = append(result, ev)
 	return result
 }
@@ -146,16 +145,6 @@ func toTaskFailedUpdateEvent(task a2a.TaskInfoProvider, cause error, meta map[st
 	ev.Metadata = meta
 	ev.Final = true
 	return ev
-}
-
-func setEscalateMeta(event *a2a.TaskStatusUpdateEvent, escalate bool) {
-	if escalate {
-		if event.Metadata == nil {
-			event.Metadata = map[string]any{metadataEscalateKey: true}
-		} else {
-			event.Metadata[metadataEscalateKey] = true
-		}
-	}
 }
 
 func isInputRequired(event *session.Event, parts []*genai.Part) bool {

@@ -86,3 +86,14 @@ func toEventMeta(meta invocationMeta, event *session.Event) (map[string]any, err
 
 	return result, nil
 }
+
+func setEscalateMeta(meta map[string]any, escalate bool) map[string]any {
+	if escalate {
+		if meta == nil {
+			meta = map[string]any{metadataEscalateKey: true}
+		} else {
+			meta[metadataEscalateKey] = true
+		}
+	}
+	return meta
+}
