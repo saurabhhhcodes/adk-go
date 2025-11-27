@@ -40,8 +40,6 @@ import (
 	"google.golang.org/adk/session"
 )
 
-const connBufSize int = 1024 * 1024
-
 type mockA2AExecutor struct {
 	executeFn func(ctx context.Context, reqCtx *a2asrv.RequestContext, queue eventqueue.Queue) error
 }
@@ -505,7 +503,8 @@ func TestRemoteAgent_RequestCallbacks(t *testing.T) {
 			wantResponses: []model.LLMResponse{
 				{
 					Content:        genai.NewContentFromText("foobar", genai.RoleModel),
-					CustomMetadata: map[string]any{"counter": 1}},
+					CustomMetadata: map[string]any{"counter": 1},
+				},
 			},
 		},
 		{
@@ -586,8 +585,8 @@ func TestRemoteAgent_RequestCallbacks(t *testing.T) {
 		},
 		{
 			name: "response overwrite with error",
-			before: []BeforeA2ARequestCallback{
-				func(ctx agent.CallbackContext, req *a2a.MessageSendParams) (*session.Event, error) {
+			after: []AfterA2ARequestCallback{
+				func(ctx agent.CallbackContext, req *a2a.MessageSendParams, event a2a.Event, err error, result *session.Event) (*session.Event, error) {
 					return nil, fmt.Errorf("failed")
 				},
 			},

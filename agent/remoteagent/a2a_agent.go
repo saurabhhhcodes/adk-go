@@ -39,7 +39,7 @@ import (
 // as the agent invocation result.
 type BeforeA2ARequestCallback func(ctx agent.CallbackContext, req *a2a.MessageSendParams) (*session.Event, error)
 
-// AfterA2ARequestCallback is called after receiving a response from the remote agent. In streaming repsonses the callback
+// AfterA2ARequestCallback is called after receiving a response from the remote agent. In streaming responses the callback
 // is invoked for every request. Session event parameter might be nil if conversion logic decides to not emit an A2A event.
 //
 // If it returns non-nil result or error, it gets emitted instead of the original result.
@@ -264,8 +264,8 @@ func destroy(client *a2aclient.Client) {
 func runBeforeA2ARequestCallbacks(ctx agent.InvocationContext, cfg A2AConfig, req *a2a.MessageSendParams) (*session.Event, error) {
 	cctx := icontext.NewCallbackContextWithDelta(ctx, make(map[string]any))
 	for _, callback := range cfg.BeforeRequestCallbacks {
-		if resp, err := callback(cctx, req); resp != nil || err != nil {
-			return resp, err
+		if cbResp, cbErr := callback(cctx, req); cbResp != nil || cbErr != nil {
+			return cbResp, cbErr
 		}
 	}
 	return nil, nil
@@ -274,8 +274,8 @@ func runBeforeA2ARequestCallbacks(ctx agent.InvocationContext, cfg A2AConfig, re
 func runAfterA2ARequestCallbacks(ctx agent.InvocationContext, cfg A2AConfig, req *a2a.MessageSendParams, event a2a.Event, err error, converted *session.Event) (*session.Event, error) {
 	cctx := icontext.NewCallbackContextWithDelta(ctx, make(map[string]any))
 	for _, callback := range cfg.AfterRequestCallbacks {
-		if event, err := callback(cctx, req, event, err, converted); event != nil || err != nil {
-			return event, err
+		if cbEvent, cbErr := callback(cctx, req, event, err, converted); event != nil || err != nil {
+			return cbEvent, cbErr
 		}
 	}
 	return nil, nil
